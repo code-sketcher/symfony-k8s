@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: symfony-k8s-www-deployment
+  namespace: symfony-k8s
+  labels:
+    app: symfony-k8s
+    tier: www
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: symfony-k8s
+      tier: www
+  template:
+    metadata:
+      labels:
+        app: symfony-k8s
+        tier: www
+    spec:
+      volumes:
+        - name: volume-nginx-config
+          configMap:
+            name: symfony-k8s-nginx-config
+        - name: nginx-root
+          emptyDir: { }
+      containers:
+        - name: php
+          image: qasketch/symfony-k8s:php-1.0.0
+          imagePullPolicy: Always
+        - name: nginx
+          image: nginx:stable
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: volume-nginx-config
+              subPath: nginx-conf
+            - mountPath: /var/www/symfony-k8s-app/public
+              name: nginx-root
+          ports:
+            - containerPort: 80
+      initContainers:
+        - name: copy-public
+          image: qasketch/symfony-k8s:php-1.0.0
+          imagePullPolicy: Always
+          command: [ "cp", "-r", "/var/www/symfony-k8s-app/public", "/tmp/" ]
+          volumeMounts:
+            - name: nginx-root
+              mountPath: /tmp/public

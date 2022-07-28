@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: symfony-k8s-www-service
+  namespace: symfony-k8s
+  labels:
+    app: symfony-k8s
+    tier: www
+spec:
+  selector:
+    app: symfony-k8s
+    tier: www
+  type: NodePort
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 30001

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: symfony-k8s-www-ingress
+  namespace: symfony-k8s
+  labels:
+    app: symfony-k8s
+    tier: www
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: symfony-k8s.ro
+      http:
+        paths:
+          - path: /
+            pathType: Exact
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80

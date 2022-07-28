@@ -1,0 +1,23 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: symfony-k8s-nginx
+    ports:
+      - 81:80
+      - 443:443
+      - 9001:9000
+    volumes:
+      - ../:/var/www/symfony-k8s-app
+      - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
+
+  php:
+    build: ./php
+      - context
+    container_name: symfony-k8s-php
+    volumes:
+      - ../:/var/www/symfony-k8s-app
+    working_dir: /var/www/symfony-k8s-app
+    user: $UID:$GID
+    ports:
+      - 8000:8000
