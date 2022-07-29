@@ -13,7 +13,6 @@ services:
 
   php:
     build: ./php
-      - context
     container_name: symfony-k8s-php
     volumes:
       - ../:/var/www/symfony-k8s-app

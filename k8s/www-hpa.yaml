@@ -1,0 +1,61 @@
+#Documentation:
+#  - https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+#  - https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+#  - https://www.youtube.com/watch?v=3BnrXapY7zo&ab_channel=CloudWithRaj
+#  - https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: symfony-k8s-www-hpa
+  namespace: symfony-k8s
+  labels:
+    app: symfony-k8s
+    tier: www
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: symfony-k8s-www-deployment
+  minReplicas: 1
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 10
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 50
+# We can also use custom metrics
+#    - type: Object
+#      object:
+#        metric:
+#          name: requests-per-second
+#        describedObject:
+#          apiVersion: networking.k8s.io/v1
+#          kind: Ingress
+#          name: symfony-k8s-www-ingress
+#        target:
+#          type: Value
+#          value: 1
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 15
+        - type: Pods
+          value: 1
+          periodSeconds: 15

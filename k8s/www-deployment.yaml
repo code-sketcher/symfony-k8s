@@ -28,6 +28,13 @@ spec:
         - name: php
           image: qasketch/symfony-k8s:php-1.0.0
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1000Mi
         - name: nginx
           image: nginx:stable
           imagePullPolicy: IfNotPresent
@@ -39,6 +46,13 @@ spec:
               name: nginx-root
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
       initContainers:
         - name: copy-public
           image: qasketch/symfony-k8s:php-1.0.0
@@ -47,3 +61,10 @@ spec:
           volumeMounts:
             - name: nginx-root
               mountPath: /tmp/public
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
